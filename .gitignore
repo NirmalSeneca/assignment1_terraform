@@ -1,1 +1,13 @@
+# Ignore Terraform state files
+dev/*.tfstate
+dev/*.tfstate.backup
+dev/*.tfplan
 dev/.terraform/
+
+# Ignore .terraform.lock.hcl file (used by Terraform 0.15 and later)
+dev/.terraform.lock.hcl
+
+
+# Ignore sensitive files containing credentials or secrets
+dev/*.pem
+dev/*.pub

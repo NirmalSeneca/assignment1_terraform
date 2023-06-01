@@ -64,6 +64,10 @@ resource "aws_instance" "my_amazon" {
   )
 }
 
+resource "aws_ecr_repository" "assignment1_repository" {
+  name = "assignment1-repository"
+}
+
 
 # Adding SSH key to Amazon EC2
 resource "aws_key_pair" "my_key" {

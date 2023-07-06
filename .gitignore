@@ -9,5 +9,5 @@ instance/.terraform.lock.hcl
 
 
 # Ignore sensitive files containing credentials or secrets
-instance/*.pem
+instance/assignment1-dev
 instance/*.pub

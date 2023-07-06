@@ -50,9 +50,34 @@ resource "aws_instance" "my_amazon" {
   ami                         = data.aws_ami.latest_amazon_linux.id
   instance_type               = lookup(var.instance_type, var.env)
   key_name                    = aws_key_pair.my_key.key_name
-  vpc_security_group_ids             = [aws_security_group.my_sg.id]
+  vpc_security_group_ids      = [aws_security_group.my_sg.id]
   associate_public_ip_address = false
+  iam_instance_profile        = "LabInstanceProfile"
 
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"  # Replace with the appropriate SSH user for your AMI
+    private_key = file("${local.name_prefix}")  # Replace with the path to your private key file
+    host        = self.public_ip
+  }
+  
+  provisioner "file" {
+    source = "~/environment/assignment1_terraform/instance/init_kind.sh"
+    destination = "/tmp/init_kind.sh"
+  }
+  
+    provisioner "file" {
+    source = "~/environment/assignment1_terraform/instance/kind.yaml"
+    destination = "/tmp/kind.yaml"
+  }
+  
+  user_data = <<-EOF
+    #!/bin/bash
+    cd /tmp/
+    chmod +x init_kind.sh
+    ./init_kind.sh
+    EOF
+  
   lifecycle {
     create_before_destroy = true
   }
@@ -64,10 +89,16 @@ resource "aws_instance" "my_amazon" {
   )
 }
 
-resource "aws_ecr_repository" "assignment1_repository" {
-  name = "assignment1-repository"
+resource "aws_ecr_repository" "assignment1_app_repository" {
+  name         = "assignment1-app-repository"
+  force_delete = true
 }
 
+
+resource "aws_ecr_repository" "assignment1_db_repository" {
+  name         = "assignment1-db-repository"
+  force_delete = true
+}
 
 # Adding SSH key to Amazon EC2
 resource "aws_key_pair" "my_key" {

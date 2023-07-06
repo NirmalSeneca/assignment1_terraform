@@ -54,6 +54,30 @@ resource "aws_instance" "my_amazon" {
   associate_public_ip_address = false
   iam_instance_profile        = "LabInstanceProfile"
 
+  connection {
+    type        = "ssh"
+    user        = "ec2-user"  # Replace with the appropriate SSH user for your AMI
+    private_key = file("${local.name_prefix}")  # Replace with the path to your private key file
+    host        = self.public_ip
+  }
+  
+  provisioner "file" {
+    source = "~/environment/assignment1_terraform/instance/init_kind.sh"
+    destination = "/tmp/init_kind.sh"
+  }
+  
+    provisioner "file" {
+    source = "~/environment/assignment1_terraform/instance/kind.yaml"
+    destination = "/tmp/kind.yaml"
+  }
+  
+  user_data = <<-EOF
+    #!/bin/bash
+    cd /tmp/
+    chmod +x init_kind.sh
+    ./init_kind.sh
+    EOF
+  
   lifecycle {
     create_before_destroy = true
   }

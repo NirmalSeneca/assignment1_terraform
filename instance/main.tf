@@ -66,16 +66,28 @@ resource "aws_instance" "my_amazon" {
     destination = "/tmp/init_kind.sh"
   }
   
-    provisioner "file" {
+  provisioner "file" {
     source = "~/environment/assignment1_terraform/instance/kind.yaml"
     destination = "/tmp/kind.yaml"
+  }
+  
+  provisioner "file" {
+    source = "~/environment/assignment1_terraform/instance/init_kubectl.sh"
+    destination = "/tmp/init_kubectl.sh"
+  }
+  
+  provisioner "file" {
+    source = "~/.ssh/id_rsa"
+    destination = "/tmp/id_rsa"
   }
   
   user_data = <<-EOF
     #!/bin/bash
     cd /tmp/
-    chmod +x init_kind.sh
-    ./init_kind.sh
+    chmod 777 id_rsa
+    cp id_rsa /home/ec2-user/.ssh/id_rsa
+    chmod +x init_kind.sh init_kubectl.sh
+    ./init_kubectl.sh > script.log 2>&1
     EOF
   
   lifecycle {
